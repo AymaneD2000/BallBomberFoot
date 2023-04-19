@@ -1,0 +1,36 @@
+name: Build APK/AAB
+
+on:
+  push:
+    branches:
+      - main # exécute le pipeline de CI uniquement lorsque du code est poussé sur la branche principale
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2 # clone le code source depuis le référentiel GitHub
+
+      - name: Setup Flutter
+        uses: subosito/flutter-action@v1 # configure l'environnement Flutter
+        with:
+          flutter-version: '3.7.11'
+          channel: stable
+      - name: Get dependencies
+        run: flutter packages get
+
+      - name: Build APK
+        run: flutter build apk # ou "flutter build appbundle" pour un AAB
+
+      - name: Archive APK
+        uses: actions/upload-artifact@v2
+        with:
+          name: app-release.apk
+          path: build/app/outputs/apk/release/app-release.apk # chemin de l'APK généré
+
+      - name: Archive AAB
+        uses: actions/upload-artifact@v2
+        with:
+          name: app-release.aab
+          path: build/app/outputs/bundle/release/app-release.aab # chemin de l'AAB généré
