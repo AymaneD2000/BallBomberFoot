@@ -3,7 +3,7 @@ name: Build APK/AAB
 on:
   push:
     branches:
-      - main # exécute le pipeline de CI uniquement lorsque du code est poussé sur la branche principale
+      - master # exécute le pipeline de CI uniquement lorsque du code est poussé sur la branche principale
 
 jobs:
   build:
