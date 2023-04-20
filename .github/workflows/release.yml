@@ -48,5 +48,5 @@ jobs:
       - name: Download APK/AAB
         uses: actions/download-artifact@v2
         with:
-          name: app-release # nom de l'artefact à télécharger
-          path: build/app/outputs/apk/release/app-release.apk
+          name: app-release.apk # nom de l'artefact à télécharger
+          path: build/app/outputs/flutter-apk/app-release.apk
