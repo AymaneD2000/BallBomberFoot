@@ -20,10 +20,7 @@ jobs:
         with:
           flutter-version: '3.7.11'
       - name: Build apk
-        run: |
-          flutter pub get
-          dart format --set-exit-if-changed .
-          flutter build apk --split-per-abi
+        run: flutter build apk --split-per-abi
       - name: Retrieve Release Version
         id: versionstep
         run: |
