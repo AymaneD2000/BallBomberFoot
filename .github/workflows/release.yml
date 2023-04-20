@@ -1,40 +1,61 @@
-name: RELEASE
+name: Release APK/AAB
+
 on:
-  workflow_dispatch:
+  release:
+    types: [published]
+  push:
     branches:
       - main
+
 jobs:
-  release:
+  build:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v2
-      - name: Configure signature
-        run: |
-          echo "${{secrets.KEY_PROPERTIES}}" > android/key.properties
-          echo "${{secrets.RELEASE_KEYSTORE}}" > file.encoded
-          base64 -d -i file.encoded > ./android/app/file.jks
-      - uses: actions/setup-java@v1
-        with:
-          java-version: '12.x'
-      - uses: subosito/flutter-action@v1
-        with:
-          flutter-version: '3.7.11'
-      - name: Build apk
-        run: flutter build apk --split-per-abi
-      - name: Retrieve Release Version
-        id: versionstep
-        run: |
-          VERSION=$(more pubspec.yaml | grep version: | cut -d ' ' -f2)
-          echo "::set-output name=VERSION::$VERSION"
+      - name: Checkout
+        uses: actions/checkout@v2
 
-      - name: Save state
-        run: echo "{name}={value}" >> $GITHUB_STATE
+      - name: Setup Flutter
+        uses: subosito/flutter-action@v1.4.0
 
-      - name: Set output
-        run: echo "{name}={value}" >> $GITHUB_OUTPUT
-      - name: Upload the APK onto Github
-        uses: ncipollo/release-action@v1
+      - name: Get dependencies
+        run: flutter packages get
+
+      - name: Build APK
+        run: flutter build apk --release # ou "flutter build appbundle --release" pour un AAB
+
+      - name: Archive APK
+        uses: actions/upload-artifact@v2
         with:
-          artifacts: 'build/app/outputs/flutter-apk/*.apk'
-          token: ${{ secrets.GITHUB_TOKEN }}
-          tag: ${{ steps.versionstep.outputs.VERSION }}
+          name: app-release.apk
+          path: build/app/outputs/apk/release/app-release.apk
+
+      - name: Archive AAB
+        uses: actions/upload-artifact@v2
+        with:
+          name: app-release.aab
+          path: build/app/outputs/bundle/release/app-release.aab
+
+  release:
+    needs: build
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+
+      - name: Setup Google Cloud SDK
+        uses: google-github-actions/setup-gcloud@master
+
+      - name: Download APK/AAB
+        uses: actions/download-artifact@v2
+        with:
+          name: app-release # nom de l'artefact à télécharger
+          path: app
+
+      - name: Publish to Google Play Store
+        run: |
+          gcloud auth activate-service-account --key-file=service-account.json
+          gcloud config set project <project-id> # remplacer <project-id> par l'ID de votre projet Google Play
+          gcloud app create --region=<region> # remplacer <region> par la région souhaitée pour votre application
+          gcloud alpha play apps upload app/* --apk --track=production # ou "gcloud alpha play apps upload app/* --aab --track=production" pour un AAB
+        env:
+          PLAY_STORE_API_KEY: ${{ secrets.PLAY_STORE_API_KEY }} # clé d'API de votre compte de service Google Play
