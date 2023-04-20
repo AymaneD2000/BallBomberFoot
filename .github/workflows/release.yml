@@ -15,7 +15,10 @@ jobs:
         uses: actions/checkout@v2
 
       - name: Setup Flutter
-        uses: subosito/flutter-action@v1.4.0
+        uses: subosito/flutter-action@v1
+        with:
+          flutter-version: '3.7.11'
+          channel: stable
 
       - name: Get dependencies
         run: flutter packages get
@@ -50,12 +53,3 @@ jobs:
         with:
           name: app-release # nom de l'artefact à télécharger
           path: app
-
-      - name: Publish to Google Play Store
-        run: |
-          gcloud auth activate-service-account --key-file=service-account.json
-          gcloud config set project <project-id> # remplacer <project-id> par l'ID de votre projet Google Play
-          gcloud app create --region=<region> # remplacer <region> par la région souhaitée pour votre application
-          gcloud alpha play apps upload app/* --apk --track=production # ou "gcloud alpha play apps upload app/* --aab --track=production" pour un AAB
-        env:
-          PLAY_STORE_API_KEY: ${{ secrets.PLAY_STORE_API_KEY }} # clé d'API de votre compte de service Google Play
