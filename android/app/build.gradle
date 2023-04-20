@@ -62,7 +62,7 @@ android {
 
     signingConfigs {
         release {
-            storeFile file("./file")
+            storeFile file("./file.jks")
             storePassword "bomberbomber"
             keyAlias "foot"
             keyPassword "bomberbomber"
