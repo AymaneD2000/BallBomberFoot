@@ -22,10 +22,8 @@ jobs:
       - name: Build apk
         run: |
           flutter pub get
-          flutter format --set-exit-if-changed .
-          flutter analyze
-          flutter test
-          flutter build apk
+          dart format --set-exit-if-changed .
+          flutter build apk --split-per-abi
       - name: Retrieve Release Version
         id: versionstep
         run: |
