@@ -1,5 +1,4 @@
 name: RELEASE
-
 on:
   workflow_dispatch:
     branches:
