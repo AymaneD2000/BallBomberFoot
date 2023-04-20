@@ -45,9 +45,6 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v2
 
-      - name: Setup Google Cloud SDK
-        uses: google-github-actions/setup-gcloud@master
-
       - name: Download APK/AAB
         uses: actions/download-artifact@v2
         with:
