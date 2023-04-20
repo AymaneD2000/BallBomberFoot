@@ -49,4 +49,4 @@ jobs:
         uses: actions/download-artifact@v2
         with:
           name: app-release # nom de l'artefact à télécharger
-          path: app
+          path: build/app/outputs/apk/release/app-release.apk
